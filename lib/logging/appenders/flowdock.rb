@@ -12,7 +12,11 @@ module Logging
     class Flowdock < ::Logging::Appender
       include Buffering
 
-      attr_reader :api_token, :flow_user, @flow
+      # We use a background flusher instead, as the connection to Flowdock can be quite slow:
+      DEFAULT_OPTS = {
+        flush_period: 1,
+      }
+      attr_reader :api_token, :flow_user, :flow
 
       # Creates a new Flowdock Appender that will use the given host and port
       # as the Flowdock server destination.
@@ -26,8 +30,11 @@ module Logging
 
         fail ArgumentError, 'Empty api_token and flow_user is not appropriate' unless api_token && !api_token.empty? && flow_user && !flow_user.empty?
 
+        # Initialise flow var:
+        flow
+
         super
-        configure_buffering(opts)
+        configure_buffering(DEFAULT_OPTS.merge(opts))
       end
 
       def flow
@@ -44,7 +51,7 @@ module Logging
       private
 
       def connect(host, port)
-        Flowdock::Flow.new(api_token: api_token, external_user_name: flow_user)
+        ::Flowdock::Flow.new(api_token: api_token, external_user_name: flow_user)
       end
 
       def canonical_write(str)
