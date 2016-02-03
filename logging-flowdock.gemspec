@@ -26,4 +26,5 @@ Gem::Specification.new do |spec|
 
   spec.add_runtime_dependency 'little-plugger', '~> 1.1'
   spec.add_runtime_dependency 'logging', '~> 2.0'
+  spec.add_runtime_dependency 'flowdock'
 end
